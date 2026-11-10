@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ลงเวลาทำงาน – หจก. บ้านท่าบริการ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f2f4f1; --card: #fff; --ink: #18211c; --muted: #66706a; --line: #e2e6e1;
+    --green: #16794a; --green-2: #e3f3ea; --amber: #b86e00; --amber-2: #fff3dc; --red: #b3261e; --red-2: #fde8e6;
+    --blue: #1f5fae; --blue-2: #e6eefa; --r: 18px;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; font-size: 16px; }
+  body { padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); }
+  .app { max-width: 480px; margin: 0 auto; padding: 14px 14px 32px; }
+  .demo { background: #22302a; color: #e9f0eb; border-radius: 14px; padding: 10px 12px; margin-bottom: 12px; font-size: 13px; }
+  .demo b { color: #9ee6b8; }
+  .demo .opts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .chip { border: 1px solid rgba(255,255,255,.25); background: transparent; color: inherit; border-radius: 999px; padding: 5px 10px; font: inherit; font-size: 12.5px; cursor: pointer; }
+  .chip.on { background: #9ee6b8; color: #12301f; border-color: #9ee6b8; font-weight: 600; }
+  header.top { display: flex; align-items: center; justify-content: space-between; margin: 4px 2px 14px; }
+  .brand { font-weight: 700; font-size: 15px; }
+  .brand small { display: block; color: var(--muted); font-weight: 500; font-size: 12.5px; }
+  .clock { text-align: right; font-variant-numeric: tabular-nums; }
+  .clock b { font-size: 22px; display: block; line-height: 1.1; }
+  .clock span { color: var(--muted); font-size: 12px; }
+  .card { background: var(--card); border-radius: var(--r); padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 0 var(--line); }
+  h1 { font-size: 21px; margin: 0 0 6px; }
+  h2 { font-size: 15px; margin: 0 0 10px; color: var(--muted); font-weight: 600; }
+  p { line-height: 1.6; margin: 6px 0; }
+  .muted { color: var(--muted); }
+  .hello { font-size: 19px; font-weight: 700; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: 13px; font-weight: 600; background: var(--green-2); color: var(--green); }
+  .pill.amber { background: var(--amber-2); color: var(--amber); }
+  .pill.gray { background: #eceeeb; color: var(--muted); }
+  .pill.blue { background: var(--blue-2); color: var(--blue); }
+  .shifts { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .shift { border: 1px solid var(--line); border-radius: 12px; padding: 6px 10px; font-size: 14px; }
+  .shift b { margin-right: 4px; }
+  .timeline { list-style: none; margin: 0; padding: 0; }
+  .timeline li { display: flex; justify-content: space-between; padding: 9px 0; border-top: 1px solid var(--line); font-size: 15px; }
+  .timeline li:first-child { border-top: 0; }
+  .btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; border: 0; border-radius: 16px; padding: 18px; font: inherit; font-size: 18px; font-weight: 700; cursor: pointer; margin-top: 10px; background: var(--green); color: #fff; }
+  .btn.out { background: #263b31; }
+  .btn.brk { background: var(--card); color: var(--ink); border: 1.5px solid var(--line); font-size: 16px; padding: 14px; }
+  .btn.ghost { background: transparent; color: var(--green); border: 1.5px solid var(--green); font-size: 15px; padding: 12px; }
+  .btn.small { font-size: 15px; padding: 11px; }
+  .btn:disabled { opacity: .45; cursor: default; }
+  .rule { font-size: 12.5px; color: var(--muted); text-align: center; margin-top: 10px; }
+  .banner { border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; font-size: 14.5px; line-height: 1.5; }
+  .banner.ok { background: var(--green-2); color: #0f5131; }
+  .banner.err { background: var(--red-2); color: #7a1711; }
+  .banner.warn { background: var(--amber-2); color: #6b4000; }
+  .step { display: flex; gap: 12px; align-items: flex-start; }
+  .dot { flex: 0 0 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 14px; background: #eceeeb; color: var(--muted); }
+  .dot.ok { background: var(--green); color: #fff; }
+  .dot.wait { background: var(--blue-2); color: var(--blue); }
+  .dot.err { background: var(--red); color: #fff; }
+  .step .body { flex: 1; min-width: 0; }
+  .step .title { font-weight: 700; margin-top: 3px; }
+  .step .sub { font-size: 14px; color: var(--muted); margin-top: 2px; line-height: 1.5; }
+  .cam { position: relative; margin-top: 10px; border-radius: 14px; overflow: hidden; background: #111; aspect-ratio: 3/4; }
+  .cam video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); display: block; }
+  .cam img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .cam .ring { position: absolute; inset: 10% 16% 24%; border: 3px dashed rgba(255,255,255,.6); border-radius: 50%; pointer-events: none; }
+  .cam.demo { background: linear-gradient(#9fb8a8, #5d7a69); }
+  .cam .say { position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 14px 16px; background: linear-gradient(transparent, rgba(0,0,0,.75)); color: #fff; font-weight: 700; font-size: 18px; text-align: center; line-height: 1.4; }
+  .cam .say.ok { color: #9ee6b8; top: 0; bottom: auto; padding: 12px 14px 18px; background: linear-gradient(rgba(0,0,0,.6), transparent); }
+  .dots { display: flex; gap: 6px; justify-content: center; margin-top: 8px; }
+  .dots i { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,.35); }
+  .dots i.on { background: #2fbf71; }
+  .row2 { display: flex; gap: 8px; } .row2 > * { flex: 1; }
+  label.f { display: block; font-weight: 600; font-size: 14px; margin: 12px 0 5px; }
+  input.f, select.f { width: 100%; font: inherit; padding: 12px; border-radius: 12px; border: 1.5px solid var(--line); background: #fff; }
+  .seg { display: flex; gap: 6px; }
+  .seg label { flex: 1; }
+  .seg input { display: none; }
+  .seg span { display: block; text-align: center; padding: 11px 6px; border: 1.5px solid var(--line); border-radius: 12px; font-weight: 600; font-size: 14.5px; cursor: pointer; }
+  .seg input:checked + span { border-color: var(--green); background: var(--green-2); color: var(--green); }
+  .pdpa { background: #f6f7f5; border-radius: 12px; padding: 12px; font-size: 13.5px; line-height: 1.6; max-height: 210px; overflow: auto; margin-top: 14px; }
+  .pdpa ul { padding-left: 18px; margin: 6px 0; }
+  .check { display: flex; gap: 10px; align-items: flex-start; margin-top: 12px; font-size: 14.5px; }
+  .check input { width: 22px; height: 22px; flex: 0 0 22px; accent-color: var(--green); }
+  .big-ok { width: 84px; height: 84px; border-radius: 50%; background: var(--green); color: #fff; display: grid; place-items: center; margin: 8px auto 12px; font-size: 44px; }
+  .center { text-align: center; }
+  .kv { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; font-size: 15px; margin-top: 12px; }
+  .kv dt { color: var(--muted); text-align: left; } .kv dd { margin: 0; font-weight: 600; text-align: right; }
+  .spinner { width: 34px; height: 34px; border: 4px solid var(--green-2); border-top-color: var(--green); border-radius: 50%; animation: spin 0.9s linear infinite; margin: 30px auto 14px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .overlay { position: fixed; inset: 0; background: rgba(10,16,13,.72); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 20; }
+  .sheet { background: #fff; border-radius: 20px; padding: 18px; width: 100%; max-width: 440px; max-height: 92vh; overflow: auto; }
+  .kiosk { background: #0f1a14; color: #f3f6f4; border-radius: 16px; padding: 18px; text-align: center; }
+  .kiosk .k-clock { font-size: 36px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .kiosk .qrbox { background: #fff; padding: 12px; border-radius: 14px; width: 230px; height: 230px; margin: 12px auto; }
+  .kiosk .qrbox img, .kiosk .qrbox canvas { width: 100% !important; height: 100% !important; }
+  .kbar { height: 6px; background: rgba(255,255,255,.15); border-radius: 4px; overflow: hidden; margin: 0 auto; width: 230px; }
+  .kbar i { display: block; height: 100%; background: #2fbf71; }
+  .chat { background: #8cabd9; border-radius: 16px; padding: 14px; }
+  .bubble { background: #fff; border-radius: 4px 16px 16px 16px; padding: 10px 12px; white-space: pre-wrap; font-size: 13.5px; line-height: 1.5; }
+  .chat .who { font-size: 12px; color: #1d2a44; margin-bottom: 4px; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="app" id="root"></div>
+
+<script>
+/* ═══════════════════════ ตั้งค่า (แก้ 2 บรรทัดนี้ตอนติดตั้งจริง) ═══════════════════════ */
+const CONFIG = {
+  LIFF_ID: '2012528106-Tvv9o87Q',
+  API_URL: 'https://script.google.com/macros/s/AKfycbyHX9e_m07Z6MHcHntd9ZuHgwXQaRKj62sujFOITuDkNdOrJjE-xexwkMB2YVcl8m8Kgw/exec',
+};
+/* ══════════════════════════════════════════════════════════════════════════════ */
+
+const DEMO = !CONFIG.LIFF_ID || !CONFIG.API_URL;
+const LABEL = { IN: 'เข้างาน', OUT: 'ออกงาน', BS: 'เริ่มพัก', BE: 'กลับจากพัก' };
+const ICON = { BS: '☕', BE: '↩' };
+const S = { status: null, offset: 0, idToken: null, deviceId: null, qr: null, qrStep: null, flow: null, stream: null, demo: { inside: true, qrOk: true } };
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+/* ─────────── เวลา ─────────── */
+const serverNow = () => Date.now() + S.offset;
+const fmtTime = (ms, sec = true) => new Intl.DateTimeFormat('th-TH', { timeZone: 'Asia/Bangkok', hour: '2-digit', minute: '2-digit', second: sec ? '2-digit' : undefined, hour12: false }).format(ms);
+const fmtDate = ms => new Intl.DateTimeFormat('th-TH', { timeZone: 'Asia/Bangkok', weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }).format(ms);
+setInterval(() => document.querySelectorAll('[data-clock]').forEach(el => { el.textContent = fmtTime(serverNow()); }), 1000);
+
+function distanceM(lat1, lng1, lat2, lng2) {
+  const R = 6371000, r = Math.PI / 180, dLat = (lat2 - lat1) * r, dLng = (lng2 - lng1) * r;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * r) * Math.cos(lat2 * r) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+
+/* ─────────── รหัสเครื่อง ─────────── */
+function getDeviceId() {
+  const KEY = 'btb_device_v1';
+  try {
+    let id = localStorage.getItem(KEY);
+    if (!id) { id = (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2) + Date.now()).replace(/-/g, ''); localStorage.setItem(KEY, id); }
+    return id;
+  } catch (e) {
+    return S._mem || (S._mem = 'nostore' + String(Math.random()).slice(2, 14));
+  }
+}
+
+/* ─────────── QR token ─────────── */
+function parseToken(text) {
+  if (!text) return null;
+  let k = text;
+  const m = /[?&]k=([^&#]+)/.exec(text);
+  if (m) k = decodeURIComponent(m[1]);
+  return /^\d+-[0-9a-f]{16}$/.test(k) ? k : null;
+}
+function captureToken(search) {
+  const sp = new URLSearchParams(search);
+  let k = sp.get('k');
+  if (!k && sp.get('liff.state')) k = new URLSearchParams(sp.get('liff.state').replace(/^[^?]*\?/, '')).get('k');
+  const t = parseToken(k);
+  if (t) { S.qr = t; S.qrStep = Number(t.split('-')[0]); }
+}
+function qrFresh() {
+  if (!S.qr || !S.status) return false;
+  const r = S.status.rules;
+  const age = serverNow() - S.qrStep * r.qrStepSec * 1000;
+  return age < (r.qrValidSec - 20) * 1000 && age > -60000;
+}
+
+/* ─────────── API ─────────── */
+async function api(action, payload = {}) {
+  const body = Object.assign({ action, idToken: S.idToken, deviceId: S.deviceId }, payload);
+  if (DEMO) return Mock.handle(body);
+  const res = await fetch(CONFIG.API_URL, { method: 'POST', body: JSON.stringify(body) }); // text/plain: ไม่ต้อง preflight
+  const data = await res.json();
+  if (!data.ok && data.error === 'token_expired') { location.reload(); throw new Error('reload'); }
+  return data;
+}
+
+async function loadStatus() {
+  renderLoading('กำลังโหลดข้อมูล…');
+  const t0 = Date.now();
+  const st = await api('status');
+  if (!st.ok) return renderFatal('เชื่อมต่อระบบไม่ได้', st.message || 'ลองใหม่อีกครั้ง', true);
+  S.offset = st.serverTime - (t0 + Date.now()) / 2;
+  S.status = st;
+  route();
+}
+
+function route() {
+  const st = S.status;
+  if (!st.employee) return renderRegister();
+  if (st.employee.status === 'รออนุมัติ') return renderPending();
+  if (st.employee.status !== 'ใช้งาน') return renderFatal('บัญชีถูกระงับ', 'ติดต่อผู้จัดการ', false);
+  renderHome();
+}
+
+/* ─────────── ส่วนหัว ─────────── */
+function demoBar() {
+  if (!DEMO) return '';
+  return `<div class="demo"><b>โหมดทดลอง</b> — กดเล่นได้เลย ไม่มีการบันทึกจริง ตำแหน่งและรูปเป็นค่าจำลอง
+    <div class="opts">
+      <button class="chip ${S.demo.inside ? 'on' : ''}" data-act="demo-in">อยู่ที่ปั๊ม</button>
+      <button class="chip ${!S.demo.inside ? 'on' : ''}" data-act="demo-out">อยู่บ้าน (นอกรัศมี)</button>
+      <button class="chip" data-act="demo-summary">ดูสรุปในกลุ่ม LINE</button>
+      <button class="chip" data-act="demo-reset">เริ่มใหม่</button>
+    </div></div>`;
+}
+function topBar() {
+  const name = S.status ? S.status.station.name : 'หจก. บ้านท่าบริการ';
+  return demoBar() + `<header class="top"><div class="brand">${esc(name)}<small>ระบบลงเวลาทำงาน</small></div>
+    <div class="clock"><b data-clock>${fmtTime(serverNow())}</b><span>${fmtDate(serverNow())}</span></div></header>`;
+}
+const paint = html => { stopCamera(); $('#root').innerHTML = topBar() + html; };
+
+function renderLoading(msg) { paint(`<div class="card center"><div class="spinner"></div><p class="muted">${esc(msg)}</p></div>`); }
+function renderFatal(title, msg, retry) {
+  paint(`<div class="card center"><h1>${esc(title)}</h1><p class="muted">${esc(msg)}</p>${retry ? '<button class="btn small" data-act="reload">ลองใหม่</button>' : ''}</div>`);
+}
+
+/* ─────────── ลงทะเบียน ─────────── */
+function renderRegister() {
+  const n = S.status.lineName || '';
+  paint(`<div class="card">
+    <h1>ลงทะเบียนพนักงาน</h1>
+    <p class="muted">ทำครั้งเดียว หลังผู้จัดการอนุมัติจึงจะลงเวลาได้${n ? ' • บัญชี LINE: ' + esc(n) : ''}</p>
+    <form id="reg">
+      <label class="f">ชื่อ-นามสกุล</label><input class="f" name="fullName" required maxlength="80" autocomplete="name">
+      <div class="row2">
+        <div><label class="f">ชื่อเล่น</label><input class="f" name="nickname" required maxlength="30"></div>
+        <div><label class="f">เบอร์โทร</label><input class="f" name="phone" required inputmode="tel" maxlength="12" placeholder="08xxxxxxxx"></div>
+      </div>
+      <label class="f">ทำงานที่</label>
+      <div class="seg"><label><input type="radio" name="unit" value="ปั๊ม" checked><span>ปั๊มน้ำมัน</span></label><label><input type="radio" name="unit" value="คาเฟ่"><span>ร้านกาแฟ</span></label></div>
+      <div class="row2">
+        <div><label class="f">ตำแหน่ง</label><input class="f" name="position" maxlength="40" placeholder="เช่น พนักงานหน้าลาน"></div>
+        <div><label class="f">ประเภท</label><select class="f" name="empType"><option>ประจำ</option><option>พาร์ทไทม์</option></select></div>
+      </div>
+      <div class="pdpa"><b>การเก็บข้อมูลส่วนบุคคล</b><br>
+        ${esc(S.status.station.name)} จะเก็บข้อมูลต่อไปนี้เพื่อบันทึกเวลาทำงานและคำนวณค่าจ้างเท่านั้น
+        <ul>
+          <li>ชื่อ ชื่อเล่น เบอร์โทร และรหัสบัญชี LINE</li>
+          <li>ตำแหน่ง GPS <b>เฉพาะตอนกดลงเวลา</b> ไม่มีการติดตามตำแหน่งตลอดเวลา</li>
+          <li>รูปเซลฟี่ตอนลงเวลา เก็บไว้ ${S.status.rules.photoRetentionDays || 90} วัน แล้วลบอัตโนมัติ</li>
+          <li>รหัสเครื่องมือถือที่ใช้ลงเวลา เพื่อป้องกันการลงเวลาแทนกัน</li>
+        </ul>
+        ผู้ที่เห็นข้อมูลได้คือเจ้าของกิจการและผู้จัดการ คุณขอดู แก้ไข หรือขอลบข้อมูลได้โดยติดต่อผู้จัดการ</div>
+      <label class="check"><input type="checkbox" name="consent" required><span>ฉันอ่านแล้วและยินยอมให้เก็บข้อมูลตามรายละเอียดข้างต้น</span></label>
+      <div id="regmsg"></div>
+      <button class="btn" type="submit">ส่งลงทะเบียน</button>
+    </form></div>`);
+  $('#reg').addEventListener('submit', async ev => {
+    ev.preventDefault();
+    const f = ev.target, btn = f.querySelector('button[type=submit]');
+    const form = Object.fromEntries(new FormData(f).entries());
+    form.consent = f.consent.checked;
+    if (!form.fullName || !form.nickname || !/^0\d{8,9}$/.test(String(form.phone).replace(/[-\s]/g, '')) || !form.consent) {
+      $('#regmsg').innerHTML = '<div class="banner err" style="margin-top:12px">กรอกชื่อ ชื่อเล่น เบอร์โทรให้ถูกต้อง และกดยินยอม</div>'; return;
+    }
+    btn.disabled = true; btn.textContent = 'กำลังส่ง…';
+    const r = await api('register', { form });
+    if (!r.ok) { $('#regmsg').innerHTML = `<div class="banner err" style="margin-top:12px">${esc(r.message)}</div>`; btn.disabled = false; btn.textContent = 'ส่งลงทะเบียน'; return; }
+    await loadStatus();
+  });
+}
+
+function renderPending() {
+  paint(`<div class="card center"><div class="big-ok" style="background:var(--blue)">⏳</div><h1>รอผู้จัดการอนุมัติ</h1>
+    <p class="muted">ส่งข้อมูลแล้ว เมื่ออนุมัติ คุณจะได้รับข้อความใน LINE</p>
+    <button class="btn ghost" data-act="reload">ตรวจสถานะอีกครั้ง</button>
+    ${DEMO ? '<button class="btn small" data-act="demo-approve">จำลอง: ผู้จัดการกดอนุมัติ</button>' : ''}</div>`);
+}
+
+/* ─────────── หน้าหลัก ─────────── */
+function renderHome(note) {
+  const st = S.status, e = st.employee, t = st.today;
+  let state = '<span class="pill gray">ยังไม่ลงเวลา</span>';
+  if (t.onBreak) state = '<span class="pill amber">☕ กำลังพัก</span>';
+  else if (t.open) state = `<span class="pill">● ทำงานอยู่ ตั้งแต่ ${esc(t.open.since.slice(0, 5))}${t.open.shift ? ' • กะ ' + esc(t.open.shift) : ''}</span>`;
+  const shifts = t.shifts.length ? t.shifts.map(s => `<span class="shift"><b>${esc(s.code)}</b>${esc(s.start)}–${esc(s.end)}</span>`).join('')
+    : '<span class="muted" style="font-size:14px">วันนี้ไม่มีกะในตาราง</span>';
+  const logs = t.logs.length ? `<ul class="timeline">${t.logs.map(l => `<li><span>${esc(l.type)}${l.shift ? ' <span class="muted">• ' + esc(l.shift) + '</span>' : ''}${l.lateMin ? ' <span class="pill amber">สาย ' + l.lateMin + ' น.</span>' : ''}</span><b>${esc(l.time.slice(0, 5))}</b></li>`).join('')}</ul>`
+    : '<p class="muted" style="font-size:14px;margin:0">ยังไม่มีรายการวันนี้</p>';
+  const btn = a => {
+    const cls = a === 'IN' ? '' : a === 'OUT' ? 'out' : 'brk';
+    return `<button class="btn ${cls}" data-act="start" data-type="${a}">${a === 'BS' || a === 'BE' ? ICON[a] + ' ' : ''}ลงเวลา${LABEL[a]}</button>`;
+  };
+  const qrNote = st.rules.qrRequired && qrFresh() ? '<div class="banner ok">✓ สแกน QR จากจอแคชเชียร์แล้ว เลือกรายการด้านล่างได้เลย</div>' : '';
+  paint(`${note || ''}${qrNote}
+    <div class="card">
+      <div class="hello">สวัสดี ${esc(e.nickname)} <span class="muted" style="font-size:14px;font-weight:500">${esc(e.id)} • ${esc(e.unit)}</span></div>
+      <div style="margin-top:8px">${state}</div>
+      <div class="shifts">${shifts}</div>
+    </div>
+    ${!st.deviceMatch ? '<div class="banner warn">⚠️ มือถือเครื่องนี้ไม่ใช่เครื่องที่ลงทะเบียนไว้ การลงเวลาจะถูกแจ้งผู้จัดการ</div>' : ''}
+    <div class="card"><h2>วันนี้</h2>${logs}</div>
+    ${st.actions.map(btn).join('')}
+    <div class="rule">ต้องอยู่ในรัศมี ${st.station.radius} ม. จากปั๊ม${st.rules.selfieRequired ? ' • ถ่ายเซลฟี่' : ''}${st.rules.qrRequired ? ' • สแกน QR ที่แคชเชียร์' : ''}</div>`);
+}
+
+/* ─────────── เซลฟี่: กล้องสดเท่านั้น ไม่มีเลือกรูปจากอัลบั้ม ─────────── */
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const CAM_ERR = 'เปิดกล้องไม่ได้ — อนุญาตให้ LINE ใช้กล้องในการตั้งค่ามือถือ หรือให้หัวหน้ากะบันทึกเวลาแทน';
+
+/** เปิดกล้องหน้าในกล่อง แล้วรอกดถ่าย คืน { dataUrl, takenAt } */
+async function captureSelfie(box, stamp, ctl) {
+  box.innerHTML = `<div class="cam"><video id="vid" playsinline autoplay muted></video><div class="ring"></div>
+    <div class="say"><div id="say">กำลังเปิดกล้อง…</div></div></div>
+    <button class="btn" id="shootbtn" disabled>📸 ถ่ายรูปและบันทึก</button>`;
+  const video = $('#vid'), btn = $('#shootbtn');
+  if (DEMO) {
+    box.querySelector('.cam').classList.add('demo');
+    $('#say').textContent = 'โหมดทดลอง: กดปุ่มด้านล่างเพื่อถ่ายรูปจำลอง';
+  } else {
+    try {
+      S.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 720 }, height: { ideal: 960 } }, audio: false });
+      video.srcObject = S.stream; await video.play();
+    } catch (e) { stopCamera(); throw new Error('camera'); }
+    $('#say').textContent = 'ให้เห็นหน้าชัด ๆ ในกรอบ แล้วกดถ่าย';
+  }
+  btn.disabled = false;
+  await new Promise((ok, no) => { btn.onclick = ok; const t = setInterval(() => { if (ctl.cancelled) { clearInterval(t); no(new Error('cancel')); } }, 300); });
+  let canvas;
+  if (DEMO) canvas = fakeFaceCanvas();
+  else {
+    canvas = document.createElement('canvas'); canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    stopCamera();
+  }
+  const dataUrl = await stamp(canvas);
+  box.innerHTML = `<div class="cam"><img src="${dataUrl}" alt=""><div class="say ok">✓ ถ่ายแล้ว</div></div>`;
+  return { dataUrl, takenAt: Date.now() };
+}
+
+function fakeFaceCanvas() {
+  const c = document.createElement('canvas'); c.width = 600; c.height = 800;
+  const g = c.getContext('2d');
+  const grd = g.createLinearGradient(0, 0, 0, 800); grd.addColorStop(0, '#9fb8a8'); grd.addColorStop(1, '#5d7a69');
+  g.fillStyle = grd; g.fillRect(0, 0, 600, 800);
+  g.fillStyle = '#f1d3b8'; g.beginPath(); g.arc(300, 320, 120, 0, Math.PI * 2); g.fill();
+  g.fillStyle = '#2b3a31'; g.beginPath(); g.arc(300, 700, 230, Math.PI, 0); g.fill();
+  g.fillStyle = '#2b2b2b'; g.beginPath(); g.arc(300, 270, 125, Math.PI, 0); g.fill();
+  return c;
+}
+function stopCamera() { if (S.stream) { S.stream.getTracks().forEach(t => t.stop()); S.stream = null; } }
+
+/* ประทับข้อมูลลงรูป */
+async function stampImage(src, lines, accent) {
+  const w = src.width, h = src.height;
+  const W = Math.min(720, w), H = Math.round(h * (W / w));
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d');
+  g.translate(W, 0); g.scale(-1, 1);              // กลับด้านให้เหมือนที่เห็นตอนถ่าย
+  g.drawImage(src, 0, 0, W, H);
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  try { await document.fonts.load('600 24px "IBM Plex Sans Thai"'); } catch (e) {}
+  const s = W / 720, pad = 22 * s, lh = 34 * s;
+  const boxH = pad * 2 + lh * lines.length + 6 * s;
+  const grd = g.createLinearGradient(0, H - boxH - 40 * s, 0, H);
+  grd.addColorStop(0, 'rgba(0,0,0,0)'); grd.addColorStop(0.35, 'rgba(0,0,0,.62)'); grd.addColorStop(1, 'rgba(0,0,0,.78)');
+  g.fillStyle = grd; g.fillRect(0, H - boxH - 40 * s, W, boxH + 40 * s);
+  g.fillStyle = accent; g.fillRect(pad, H - boxH + pad - 4 * s, 8 * s, lh * 2 - 6 * s);
+  g.textBaseline = 'top';
+  lines.forEach((l, i) => {
+    g.font = `${l.bold ? 700 : 500} ${l.size * s}px "IBM Plex Sans Thai", sans-serif`;
+    g.fillStyle = i < 2 ? '#fff' : 'rgba(255,255,255,.86)';
+    g.fillText(l.t, pad + (i < 2 ? 20 * s : 0), H - boxH + pad + i * lh, W - pad * 2);
+  });
+  return c.toDataURL('image/jpeg', 0.72);
+}
+
+/* ─────────── ขั้นตอนลงเวลา: หน้าจอเดียว GPS + ใบหน้า แล้วบันทึกเอง ─────────── */
+function startFlow(type) {
+  const r = S.status.rules;
+  S.flow = { type, gps: { state: 'idle' }, face: null, error: null, submitting: false, ctl: { cancelled: false } };
+  paint(`<div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <h1 style="margin:0">ลงเวลา${LABEL[type]}</h1><span id="gpsline" class="pill gray">📍 กำลังหาตำแหน่ง…</span>
+      </div>
+      <div id="facebox" style="margin-top:12px"></div>
+      <div id="sec-qr"></div>
+    </div>
+    <div id="sec-err"></div>
+    <button class="btn ghost" data-act="home">ยกเลิก</button>`);
+  acquireGps();
+  fetchNetIp();
+  drawQr();
+  doFace();
+}
+
+async function doFace() {
+  const f = S.flow;
+  if (!S.status.rules.selfieRequired) { f.face = { dataUrl: '', takenAt: Date.now() }; return trySubmit(); }
+  f.error = null; drawErr();
+  try {
+    f.face = await captureSelfie($('#facebox'), c => stampImage(c, clockStampLines(f), f.type === 'IN' ? '#2fbf71' : f.type === 'OUT' ? '#e0e6e2' : '#f2b441'), f.ctl);
+  } catch (e) {
+    if (S.flow !== f || e.message === 'cancel') return;
+    f.error = { msg: e.message === 'camera' ? CAM_ERR : 'ถ่ายรูปไม่สำเร็จ ลองใหม่', act: 'reface', label: 'ลองใหม่' };
+    $('#facebox').innerHTML = '';
+    return drawErr();
+  }
+  trySubmit();
+}
+function clockStampLines(f) {
+  const st = S.status, e = st.employee, now = serverNow(), g = f.gps;
+  return [
+    { t: `${LABEL[f.type]} • ${e.nickname} (${e.id})`, size: 30, bold: true },
+    { t: `${fmtDate(now)}  ${fmtTime(now)} น.`, size: 26, bold: true },
+    { t: st.station.name, size: 22 },
+    { t: g.state === 'ok' ? `ห่างจากปั๊ม ${Math.round(g.dist)} ม. (±${Math.round(g.acc)} ม.)  ${g.lat.toFixed(5)}, ${g.lng.toFixed(5)}` : 'กำลังหาตำแหน่ง', size: 19 },
+  ];
+}
+
+function drawErr() {
+  const f = S.flow, el = $('#sec-err');
+  if (!el || !f) return;
+  el.innerHTML = f.error ? `<div class="banner err">${esc(f.error.msg)}${f.error.act ? `<button class="btn small" data-act="${f.error.act}" style="margin-top:10px">${esc(f.error.label)}</button>` : ''}</div>` : '';
+}
+
+function drawGps() {
+  const g = S.flow.gps, st = S.status.station, el = $('#gpsline');
+  if (!el) return;
+  if (g.state === 'ok') {
+    const inside = g.dist <= st.radius;
+    el.className = 'pill ' + (inside ? '' : 'amber');
+    el.textContent = (inside ? '📍 ' : '⚠️ ') + Math.round(g.dist) + ' ม. จากปั๊ม';
+  } else if (g.state === 'err') { el.className = 'pill amber'; el.textContent = '⚠️ ไม่พบตำแหน่ง'; }
+  else { el.className = 'pill gray'; el.textContent = '📍 ' + (g.msg || 'กำลังหาตำแหน่ง…'); }
+}
+
+/* QR (ใช้เฉพาะเมื่อผู้ดูแลเปิด QR_REQUIRED) */
+function drawQr() {
+  const el = $('#sec-qr');
+  if (!el) return;
+  if (!S.status.rules.qrRequired) { el.innerHTML = ''; return; }
+  el.innerHTML = qrFresh() ? '<div class="banner ok" style="margin:12px 0 0">✓ สแกน QR แล้ว</div>'
+    : '<button class="btn small" data-act="scan" style="margin-top:12px">📷 สแกน QR ที่จอแคชเชียร์</button>';
+}
+
+/* IP สาธารณะ ใช้เทียบกับจอที่แคชเชียร์ว่าต่อ Wi-Fi ปั๊มอยู่ไหม */
+function fetchNetIp() {
+  if (DEMO) return;
+  const f = S.flow, ctl = new AbortController();
+  setTimeout(() => ctl.abort(), 5000);
+  fetch('https://api.ipify.org?format=json', { signal: ctl.signal }).then(r => r.json()).then(j => { if (S.flow === f) f.netIp = j.ip; }).catch(() => {});
+}
+
+/* GPS: ฟังหลายครั้งแล้วเลือกค่าที่แม่นที่สุด */
+function acquireGps() {
+  const g = S.flow.gps = { state: 'wait' };
+  drawGps();
+  const done = best => {
+    if (!S.flow || S.flow.gps !== g) return;
+    if (!best) Object.assign(g, { state: 'err', msg: g.msg || 'ไม่พบสัญญาณ GPS' });
+    else { const st = S.status.station; Object.assign(g, best, { state: 'ok', dist: distanceM(best.lat, best.lng, st.lat, st.lng) }); }
+    drawGps();
+    if (g.state === 'err') { S.flow.error = { msg: g.msg, act: 'gps', label: 'หาตำแหน่งใหม่' }; drawErr(); }
+    trySubmit();
+  };
+  if (DEMO) {
+    setTimeout(() => {
+      const st = S.status.station;
+      const p = S.demo.inside ? jitter(st.lat, st.lng, 30) : { lat: st.lat + 0.0162, lng: st.lng - 0.0035 };
+      done({ lat: p.lat, lng: p.lng, acc: 6 + Math.random() * 10, at: Date.now() });
+    }, 900);
+    return;
+  }
+  if (!navigator.geolocation) { g.msg = 'เครื่องนี้ไม่รองรับ GPS'; return done(null); }
+  let best = null, finished = false;
+  const maxAcc = S.status.station.maxAccuracy;
+  const finish = () => { if (finished) return; finished = true; navigator.geolocation.clearWatch(wid); clearTimeout(tid); done(best); };
+  const wid = navigator.geolocation.watchPosition(p => {
+    const c = p.coords;
+    if (!best || c.accuracy < best.acc) best = { lat: c.latitude, lng: c.longitude, acc: c.accuracy, at: Date.now() };
+    g.msg = '±' + Math.round(best.acc) + ' ม.';
+    drawGps();
+    if (best.acc <= Math.min(20, maxAcc)) finish();
+  }, err => {
+    g.msg = err.code === 1 ? 'ไม่ได้อนุญาตให้ใช้ตำแหน่ง — เปิดสิทธิ์ตำแหน่งให้ LINE ในการตั้งค่ามือถือ แล้วลองใหม่' : 'หาตำแหน่งไม่ได้ เปิด GPS แล้วลองใหม่';
+    if (err.code === 1) { best = null; finish(); }
+  }, { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 });
+  const tid = setTimeout(finish, 15000);
+}
+function jitter(lat, lng, m) {
+  const a = Math.random() * 2 * Math.PI, d = Math.random() * m;
+  return { lat: lat + (d * Math.cos(a)) / 111320, lng: lng + (d * Math.sin(a)) / (111320 * Math.cos(lat * Math.PI / 180)) };
+}
+
+/* สแกน QR */
+async function scanQr() {
+  let text = null;
+  if (DEMO) text = await Mock.kioskUrl(true);
+  else {
+    try { text = (await liff.scanCodeV2()).value; } catch (e) { if (S.flow) { S.flow.error = { msg: 'เปิดตัวสแกนไม่ได้' }; drawErr(); } return; }
+  }
+  const t = parseToken(text);
+  if (!t) { if (S.flow) { S.flow.error = { msg: 'QR นี้ไม่ใช่ของระบบลงเวลา' }; drawErr(); } return; }
+  S.qr = t; S.qrStep = Number(t.split('-')[0]);
+  if (!S.flow) return renderHome();
+  drawQr(); trySubmit();
+}
+
+/* บันทึกอัตโนมัติเมื่อทุกอย่างพร้อม */
+function trySubmit() {
+  const f = S.flow;
+  if (!f || f.submitting || f.error) return;
+  if (!f.face) return;
+  if (f.gps.state !== 'ok') { const s = $('#facebox .say'); if (s && f.gps.state === 'wait') s.textContent = '✓ ถ่ายแล้ว • รอตำแหน่ง GPS…'; return; }
+  if (S.status.rules.qrRequired && !qrFresh()) return;
+  submit();
+}
+
+async function submit() {
+  const f = S.flow;
+  if (f.face && Date.now() - f.face.takenAt > 150000) { f.face = null; return doFace(); }   // รูปเก่าเกิน ถ่ายใหม่
+  f.submitting = true; f.error = null; drawErr();
+  const say = $('#say'); if (say) say.textContent = 'กำลังบันทึก…';
+  const now = Date.now();
+  const r = await api('clock', {
+    type: f.type, qr: S.qr, netIp: f.netIp || '', lat: f.gps.lat, lng: f.gps.lng, acc: f.gps.acc, posTime: f.gps.at, clientTime: now,
+    photo: f.face.dataUrl || '', photoTakenAt: f.face.takenAt || 0, photoSource: 'camera',
+  }).catch(() => ({ ok: false, message: 'ส่งข้อมูลไม่สำเร็จ ตรวจอินเทอร์เน็ตแล้วลองใหม่' }));
+  if (S.flow !== f) return;
+  f.submitting = false;
+  if (!r.ok) {
+    const e = r.error;
+    if (e === 'outside' || e === 'gps_inaccurate' || e === 'gps_stale') f.error = { msg: r.message, act: 'gps', label: 'หาตำแหน่งใหม่' };
+    else if (e === 'photo') { f.face = null; $('#facebox').innerHTML = ''; f.error = { msg: r.message, act: 'reface', label: 'ถ่ายใหม่' }; }
+    else if (e === 'qr') { S.qr = null; drawQr(); f.error = { msg: r.message }; }
+    else f.error = { msg: r.message || 'บันทึกไม่สำเร็จ', act: 'resubmit', label: 'ลองส่งอีกครั้ง' };
+    return drawErr();
+  }
+  S.qr = null;
+  renderResult(r);
+}
+
+function renderResult(r) {
+  if (S.flow) S.flow.ctl.cancelled = true;
+  S.flow = null;
+  const late = r.lateMin ? `<span class="pill amber">สาย ${r.lateMin} นาที</span>` : r.type === 'IN' ? '<span class="pill">ตรงเวลา</span>' : '';
+  const early = r.earlyMin ? `<span class="pill amber">ออกก่อนเวลา ${r.earlyMin} นาที</span>` : '';
+  paint(`<div class="card center">
+    <div class="big-ok">✓</div>
+    <h1>บันทึก${esc(r.label)}แล้ว</h1>
+    <div style="font-size:40px;font-weight:700;font-variant-numeric:tabular-nums">${esc(r.time)}</div>
+    <div style="margin-top:8px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap">${late}${early}${r.flags && r.flags.indexOf('นอกตาราง') >= 0 ? '<span class="pill blue">นอกตารางกะ</span>' : ''}</div>
+    <dl class="kv"><dt>กะ</dt><dd>${esc(r.shift || '—')}</dd><dt>ห่างจากปั๊ม</dt><dd>${r.distance} ม.</dd><dt>วันที่</dt><dd>${fmtDate(r.serverTime)}</dd></dl>
+  </div>
+  ${!DEMO && window.liff && liff.isInClient() ? '<button class="btn" data-act="close">เสร็จ ปิดหน้านี้</button>' : ''}
+  <button class="btn ghost" data-act="reload">กลับหน้าหลัก</button>`);
+}
+
+/* ─────────── ปุ่มทั้งหมด ─────────── */
+document.addEventListener('click', ev => {
+  const b = ev.target.closest('[data-act]');
+  if (!b || b.disabled) return;
+  const a = b.dataset.act;
+  ({
+    reload: () => loadStatus(),
+    home: () => { if (S.flow) S.flow.ctl.cancelled = true; S.flow = null; renderHome(); },
+    start: () => startFlow(b.dataset.type),
+    scan: () => scanQr(),
+    gps: () => { S.flow.error = null; drawErr(); acquireGps(); },
+    reface: () => { S.flow.error = null; S.flow.face = null; doFace(); },
+    resubmit: () => { S.flow.error = null; trySubmit(); },
+    close: () => liff.closeWindow(),
+    'demo-in': () => { S.demo.inside = true; refreshDemo(); },
+    'demo-out': () => { S.demo.inside = false; refreshDemo(); },
+    'demo-qr': () => { S.demo.qrOk = !S.demo.qrOk; if (!S.demo.qrOk) S.qr = null; refreshDemo(); },
+    'demo-kiosk': () => Mock.showKiosk(),
+    'demo-summary': () => Mock.showSummary(),
+    'demo-reset': () => { Mock.reset(); S.qr = null; S.flow = null; loadStatus(); },
+    'demo-approve': () => { Mock.approve(); loadStatus(); },
+    'close-overlay': () => { const o = $('.overlay'); if (o) o.remove(); Mock.stopKiosk(); },
+  }[a] || (() => {}))();
+});
+function refreshDemo() {
+  if (S.flow) { const t = S.flow.type; S.flow.ctl.cancelled = true; stopCamera(); startFlow(t); } else route();
+}
+
+/* ─────────── เริ่มทำงาน ─────────── */
+function loadScript(src) { return new Promise((ok, no) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = no; document.head.appendChild(s); }); }
+
+async function boot() {
+  S.deviceId = getDeviceId();
+  captureToken(location.search);
+  if (DEMO) { S.idToken = 'demo'; return loadStatus(); }
+  renderLoading('กำลังเชื่อมต่อ LINE…');
+  try {
+    await loadScript('https://static.line-scdn.net/liff/edge/2/sdk.js');
+    await liff.init({ liffId: CONFIG.LIFF_ID });
+  } catch (e) {
+    return renderFatal('เชื่อมต่อ LINE ไม่ได้', 'ลองปิดแล้วเปิดใหม่อีกครั้ง', true);
+  }
+  captureToken(location.search);
+  if (!liff.isInClient()) return renderFatal('เปิดผ่านแอป LINE เท่านั้น', 'ใช้กล้องสแกน QR ในแอป LINE สแกนจอแคชเชียร์ หรือกดเมนู "ลงเวลา" ใน LINE OA ของปั๊ม', false);
+  S.idToken = liff.getIDToken();
+  if (!S.idToken) return renderFatal('ยืนยันตัวตนไม่ได้', 'ผู้ดูแล: ตรวจว่า LIFF เปิดสิทธิ์ openid แล้ว', true);
+  try { await loadStatus(); } catch (e) { if (e.message !== 'reload') renderFatal('เชื่อมต่อระบบไม่ได้', 'ตรวจอินเทอร์เน็ตแล้วลองใหม่', true); }
+}
+
+/* ═══════════════════════ เซิร์ฟเวอร์จำลอง (ใช้เฉพาะโหมดทดลอง) ═══════════════════════ */
+const Mock = (() => {
+  const station = { name: 'หจก. บ้านท่าบริการ', lat: 19.736627, lng: 99.142776, radius: 100, maxAccuracy: 50 };
+  const rules = { qrRequired: false, selfieRequired: true, liveness: false, faceMatch: false, breakEnabled: true, qrStepSec: 30, qrValidSec: 90, photoRetentionDays: 90 };
+  const SECRET = 'demo-secret';
+  let st, kioskTimer = null;
+  function reset() {
+    const now = Date.now(), slot = 30 * 60000;
+    const start = Math.ceil((now + 60000) / slot) * slot; // กะทดลองเริ่มภายใน 30 นาทีข้างหน้า
+    st = { emp: null, logs: [], shift: { code: 'B2', name: 'กะทดลอง', start, end: start + 9 * 3600000 } };
+  }
+  reset();
+  const hm = ms => fmtTime(ms, false);
+  async function sig(step) {
+    const enc = new TextEncoder();
+    const k = await crypto.subtle.importKey('raw', enc.encode(SECRET), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+    const s = await crypto.subtle.sign('HMAC', k, enc.encode('BTB|' + step));
+    return Array.from(new Uint8Array(s)).map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 16);
+  }
+  async function kioskUrl(valid) {
+    const step = Math.floor(Date.now() / 30000) - (valid ? 0 : 10);
+    return 'https://liff.line.me/DEMO?k=' + step + '-' + (await sig(step));
+  }
+  async function verifyQr(tok) {
+    const m = /^(\d+)-([0-9a-f]{16})$/.exec(tok || '');
+    if (!m) return false;
+    const cur = Math.floor(Date.now() / 30000), step = Number(m[1]);
+    return step <= cur + 1 && step >= cur - 4 && (await sig(step)) === m[2];
+  }
+  const fail = (error, message) => ({ ok: false, error, message });
+  function state() {
+    let open = null, onBreak = false;
+    st.logs.forEach(l => { if (l.code === 'IN') { open = l; onBreak = false; } else if (l.code === 'OUT') { open = null; } else if (l.code === 'BS') onBreak = true; else if (l.code === 'BE') onBreak = false; });
+    return { open, onBreak };
+  }
+  function status() {
+    const base = { ok: true, serverTime: Date.now(), station, rules, lineName: 'Somchai 🙂' };
+    if (!st.emp) return Object.assign(base, { employee: null });
+    const out = Object.assign(base, { employee: st.emp });
+    if (st.emp.status !== 'ใช้งาน') return out;
+    const s = state();
+    out.today = {
+      shifts: [{ code: st.shift.code, name: st.shift.name, start: hm(st.shift.start), end: hm(st.shift.end) }],
+      logs: st.logs.map(l => ({ type: LABEL[l.code], time: l.time, shift: l.shift, lateMin: l.lateMin })),
+      open: s.open ? { shift: s.open.shift, since: s.open.time } : null, onBreak: s.onBreak,
+    };
+    out.actions = !s.open ? ['IN'] : [s.onBreak ? 'BE' : 'BS', 'OUT'];
+    out.deviceMatch = true;
+    return out;
+  }
+  async function clock(b) {
+    await new Promise(r => setTimeout(r, 700));
+    if (rules.qrRequired && !(await verifyQr(b.qr))) return fail('qr', 'QR หมดอายุหรือไม่ถูกต้อง สแกนใหม่ที่จอแคชเชียร์');
+    if (b.acc > station.maxAccuracy) return fail('gps_inaccurate', 'สัญญาณ GPS ยังไม่แม่น');
+    const d = distanceM(b.lat, b.lng, station.lat, station.lng);
+    if (d > station.radius) return fail('outside', 'คุณอยู่ห่างจากปั๊ม ' + Math.round(d) + ' ม. (ต้องไม่เกิน ' + station.radius + ' ม.)');
+    if (!b.photo) return fail('photo', 'ต้องถ่ายเซลฟี่ก่อนส่ง');
+    const s = state(), now = Date.now();
+    if (b.type !== 'IN' && !s.open) return fail('no_open', 'ยังไม่ได้ลงเวลาเข้างาน');
+    if (b.type === 'IN' && s.open) return fail('state', 'ลงเวลาเข้างานไว้แล้ว');
+    let lateMin = 0, earlyMin = 0;
+    if (b.type === 'IN') { const lm = Math.floor((now - st.shift.start) / 60000); if (lm > 5) lateMin = lm; }
+    if (b.type === 'OUT' && now < st.shift.end) earlyMin = Math.floor((st.shift.end - now) / 60000);
+    const time = fmtTime(now);
+    st.logs.push({ code: b.type, time, shift: st.shift.code, lateMin, earlyMin, at: now });
+    return { ok: true, type: b.type, label: LABEL[b.type], time, serverTime: now, shift: st.shift.code, lateMin, earlyMin, distance: Math.round(d), flags: [] };
+  }
+  async function handle(b) {
+    await new Promise(r => setTimeout(r, 300));
+    if (b.action === 'status') return status();
+    if (b.action === 'register') {
+      const f = b.form;
+      if (!f.fullName || !f.nickname || !f.phone) return fail('invalid', 'กรอกชื่อ ชื่อเล่น และเบอร์โทรให้ครบ');
+      if (!/^0\d{8,9}$/.test(String(f.phone).replace(/[-\s]/g, ''))) return fail('invalid', 'เบอร์โทรไม่ถูกต้อง');
+      if (!f.consent) return fail('invalid', 'ต้องกดยินยอมการเก็บข้อมูลก่อน');
+      st.emp = { id: '', nickname: f.nickname, fullName: f.fullName, unit: f.unit, status: 'รออนุมัติ' };
+      return { ok: true };
+    }
+    if (b.action === 'clock') return clock(b);
+    return fail('unknown', '');
+  }
+  function approve() { if (st.emp) { st.emp.status = 'ใช้งาน'; st.emp.id = st.emp.unit === 'คาเฟ่' ? 'C01' : 'P03'; } }
+
+  function overlay(html) {
+    const o = document.createElement('div'); o.className = 'overlay';
+    o.innerHTML = `<div class="sheet">${html}<button class="btn ghost" data-act="close-overlay">ปิด</button></div>`;
+    o.addEventListener('click', e => { if (e.target === o) { o.remove(); stopKiosk(); } });
+    document.body.appendChild(o);
+    return o;
+  }
+  async function showKiosk() {
+    const o = overlay(`<div class="kiosk"><div style="font-weight:700">${esc(station.name)}</div>
+      <div class="k-clock" data-clock>${fmtTime(Date.now())}</div><div class="qrbox" id="kqr"></div>
+      <div class="kbar"><i id="kbar"></i></div>
+      <div style="font-size:13px;margin-top:10px;opacity:.85">ตั้งแท็บเล็ตไว้ที่แคชเชียร์ QR เปลี่ยนทุก 30 วินาที<br>รูป/ภาพถ่ายของ QR ใช้ไม่ได้หลังผ่านไป 2 นาที</div></div>
+      <button class="btn small" data-act="close-overlay" onclick="setTimeout(()=>scanQr(),0)">จำลอง: สแกน QR นี้</button>`);
+    try { if (!window.QRCode) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js'); } catch (e) {}
+    let last = -1, q = null;
+    const tick = async () => {
+      const now = Date.now(), step = Math.floor(now / 30000);
+      const bar = o.querySelector('#kbar'); if (!bar) return;
+      bar.style.width = (100 - (now % 30000) / 300) + '%';
+      if (step !== last) {
+        last = step;
+        const url = await kioskUrl(true);
+        const box = o.querySelector('#kqr');
+        if (window.QRCode) { if (!q) q = new QRCode(box, { text: url, width: 256, height: 256, correctLevel: QRCode.CorrectLevel.M }); else { q.clear(); q.makeCode(url); } }
+        else box.innerHTML = '<div style="color:#333;font-size:12px;word-break:break-all;padding-top:80px">' + esc(url) + '</div>';
+      }
+    };
+    tick(); kioskTimer = setInterval(tick, 250);
+  }
+  function stopKiosk() { if (kioskTimer) { clearInterval(kioskTimer); kioskTimer = null; } }
+  function showSummary() {
+    const now = Date.now(), name = st.emp && st.emp.id ? st.emp.nickname : 'แบงค์';
+    const inn = st.logs.find(l => l.code === 'IN' && l.lateMin > 0);
+    const lines = [`☀️ สรุปเช้า ${fmtDate(now)} (09:30)`, 'มาแล้ว 11/12 กะ • สาย 2 • ยังไม่ลงเวลา 1', '', '⏰ สาย',
+      `• ${inn ? name : 'ต้น'} กะ ${inn ? inn.shift : 'A1'} เข้า ${inn ? inn.time.slice(0, 5) : '04:41'} (สาย ${inn ? inn.lateMin : 11} น.)`, '• มด กะ CF1 เข้า 07:09 (สาย 9 น.)',
+      '', '❌ ยังไม่ลงเวลา', '• เอก กะ B1 (08:00)', '', '🔓 ลืมลงเวลาออก', '• ตาล กะ C1 (เมื่อวาน)',
+      '', '⚠️ เหตุผิดปกติ', '• เอก: ลงเวลานอกรัศมี ×2', '• นุ่น: ลงเวลาจากเครื่องอื่น'];
+    overlay(`<h1>ตัวอย่างสรุปในกลุ่ม LINE ผู้บริหาร</h1><p class="muted" style="font-size:14px">ส่งวันละ 2 รอบ (≈09:30 และ ≈21:30) เหตุร้ายแรงจะแจ้งทันที</p>
+      <div class="chat"><div class="who">${esc(station.name)}</div><div class="bubble">${esc(lines.join('\n'))}</div></div>`);
+  }
+  return { handle, approve, reset, kioskUrl, showKiosk, stopKiosk, showSummary };
+})();
+
+boot();
+</script>
+</body>
+</html>
