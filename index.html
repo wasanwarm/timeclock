@@ -245,7 +245,7 @@ function openTab(t) {
 function tabs(active) {
   const pend = S.my ? S.my.requests.filter(r => r.status === 'รออนุมัติ' || r.needDoc).length : 0;
   const b = (id, icon, label, badge) => `<button class="${active === id ? 'on' : ''}" data-act="tab" data-tab="${id}"><i>${icon}</i>${label}${badge ? '<span class="badge">' + badge + '</span>' : ''}</button>`;
-  return `<nav class="tabs"><div class="in">${b('clock', '⏱', 'ลงเวลา')}${b('my', '📊', 'ของฉัน')}${b('req', '📝', 'คำขอ', pend)}</div></nav>`;
+  return `<nav class="tabs"><div class="in">${b('clock', '⏱', 'ลงเวลา')}${b('my', '📊', 'ข้อมูลของฉัน')}${b('req', '📝', 'คำขอ', pend)}</div></nav>`;
 }
 
 /* ─────────── ส่วนหัว ─────────── */
