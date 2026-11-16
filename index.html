@@ -72,7 +72,8 @@
   .dots { display: flex; gap: 6px; justify-content: center; margin-top: 8px; }
   .dots i { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,.35); }
   .dots i.on { background: #2fbf71; }
-  .row2 { display: flex; gap: 8px; } .row2 > * { flex: 1; }
+  .row2 { display: flex; gap: 8px; } .row2 > * { flex: 1; min-width: 0; }
+  input.f[type=date], input.f[type=time] { min-width: 0; -webkit-appearance: none; appearance: none; min-height: 48px; }
   label.f { display: block; font-weight: 600; font-size: 14px; margin: 12px 0 5px; }
   input.f, select.f { width: 100%; font: inherit; padding: 12px; border-radius: 12px; border: 1.5px solid var(--line); background: #fff; }
   .seg { display: flex; gap: 6px; }
@@ -101,6 +102,45 @@
   .chat { background: #8cabd9; border-radius: 16px; padding: 14px; }
   .bubble { background: #fff; border-radius: 4px 16px 16px 16px; padding: 10px 12px; white-space: pre-wrap; font-size: 13.5px; line-height: 1.5; }
   .chat .who { font-size: 12px; color: #1d2a44; margin-bottom: 4px; font-weight: 600; }
+  /* แท็บล่าง */
+  .app.has-tabs { padding-bottom: 96px; }
+  nav.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; background: #fff; border-top: 1px solid var(--line); display: flex; justify-content: center; padding: 6px 6px calc(6px + env(safe-area-inset-bottom)); }
+  nav.tabs .in { display: flex; width: 100%; max-width: 480px; }
+  nav.tabs button { flex: 1; border: 0; background: none; font: inherit; font-size: 12.5px; color: var(--muted); padding: 4px 0; display: flex; flex-direction: column; align-items: center; gap: 1px; cursor: pointer; position: relative; }
+  nav.tabs button i { font-style: normal; font-size: 21px; line-height: 1.2; }
+  nav.tabs button.on { color: var(--green); font-weight: 700; }
+  nav.tabs .badge { position: absolute; top: 0; left: 55%; background: var(--red); color: #fff; font-size: 11px; border-radius: 9px; padding: 0 5px; font-weight: 700; }
+  .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .stat { background: #f6f7f5; border-radius: 12px; padding: 10px 6px; text-align: center; }
+  .stat b { display: block; font-size: 21px; font-variant-numeric: tabular-nums; }
+  .stat span { font-size: 12px; color: var(--muted); }
+  .stat.warn b { color: var(--amber); } .stat.bad b { color: var(--red); }
+  .balrow { padding: 9px 0; border-top: 1px solid var(--line); }
+  .balrow:first-of-type { border-top: 0; }
+  .balrow .t { display: flex; justify-content: space-between; font-size: 15px; }
+  .bar2 { height: 6px; background: #eceeeb; border-radius: 4px; overflow: hidden; margin-top: 5px; }
+  .bar2 i { display: block; height: 100%; background: var(--green); }
+  .req { border-top: 1px solid var(--line); padding: 11px 0; }
+  .req:first-of-type { border-top: 0; }
+  .req .t { display: flex; justify-content: space-between; gap: 8px; align-items: flex-start; }
+  .req .what { font-weight: 600; font-size: 15px; }
+  .req .acts { display: flex; gap: 8px; margin-top: 6px; }
+  .req .acts button { font: inherit; font-size: 13.5px; padding: 6px 12px; border-radius: 10px; border: 1.5px solid var(--line); background: #fff; cursor: pointer; }
+  .pill.red { background: var(--red-2); color: var(--red); }
+  textarea.f { width: 100%; font: inherit; padding: 12px; border-radius: 12px; border: 1.5px solid var(--line); resize: vertical; }
+  .preview { background: var(--blue-2); color: #173e70; border-radius: 12px; padding: 11px 12px; margin-top: 12px; font-size: 14.5px; line-height: 1.55; }
+  .preview.err { background: var(--red-2); color: #7a1711; }
+  .hint { font-size: 13px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+  .seg.three span { font-size: 13.5px; padding: 10px 4px; }
+  .seg.kind span { font-size: 14px; }
+  .reason { border: 2px solid var(--amber); background: var(--amber-2); border-radius: 14px; padding: 12px; margin-top: 12px; }
+  .reason .q { font-weight: 700; color: #6b4000; }
+  .reason .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .reason .chips button { font: inherit; font-size: 14px; padding: 8px 12px; border-radius: 999px; border: 1.5px solid #e2c48a; background: #fff; cursor: pointer; }
+  .reason .chips button.on { background: var(--amber); border-color: var(--amber); color: #fff; font-weight: 600; }
+  .reason .other { display: flex; gap: 6px; margin-top: 8px; }
+  .reason .other input { flex: 1; min-width: 0; font: inherit; padding: 10px; border-radius: 10px; border: 1.5px solid #e2c48a; }
+  .reason .other button { font: inherit; font-weight: 700; padding: 0 16px; border: 0; border-radius: 10px; background: var(--amber); color: #fff; }
 </style>
 </head>
 <body>
@@ -192,7 +232,20 @@ function route() {
   if (!st.employee) return renderRegister();
   if (st.employee.status === 'รออนุมัติ') return renderPending();
   if (st.employee.status !== 'ใช้งาน') return renderFatal('บัญชีถูกระงับ', 'ติดต่อผู้จัดการ', false);
+  openTab(S.tab || 'clock');
+}
+
+/* ─────────── แท็บ ─────────── */
+function openTab(t) {
+  S.tab = t;
+  if (t === 'my') return renderMy();
+  if (t === 'req') return renderReqs();
   renderHome();
+}
+function tabs(active) {
+  const pend = S.my ? S.my.requests.filter(r => r.status === 'รออนุมัติ' || r.needDoc).length : 0;
+  const b = (id, icon, label, badge) => `<button class="${active === id ? 'on' : ''}" data-act="tab" data-tab="${id}"><i>${icon}</i>${label}${badge ? '<span class="badge">' + badge + '</span>' : ''}</button>`;
+  return `<nav class="tabs"><div class="in">${b('clock', '⏱', 'ลงเวลา')}${b('my', '📊', 'ของฉัน')}${b('req', '📝', 'คำขอ', pend)}</div></nav>`;
 }
 
 /* ─────────── ส่วนหัว ─────────── */
@@ -211,7 +264,7 @@ function topBar() {
   return demoBar() + `<header class="top"><div class="brand">${esc(name)}<small>ระบบลงเวลาทำงาน</small></div>
     <div class="clock"><b data-clock>${fmtTime(serverNow())}</b><span>${fmtDate(serverNow())}</span></div></header>`;
 }
-const paint = html => { stopCamera(); $('#root').innerHTML = topBar() + html; };
+const paint = html => { stopCamera(); $('#root').innerHTML = topBar() + html; $('#root').classList.toggle('has-tabs', html.indexOf('<nav class="tabs"') >= 0); };
 
 function renderLoading(msg) { paint(`<div class="card center"><div class="spinner"></div><p class="muted">${esc(msg)}</p></div>`); }
 function renderFatal(title, msg, retry) {
@@ -295,7 +348,186 @@ function renderHome(note) {
     ${!st.deviceMatch ? '<div class="banner warn">⚠️ มือถือเครื่องนี้ไม่ใช่เครื่องที่ลงทะเบียนไว้ การลงเวลาจะถูกแจ้งผู้จัดการ</div>' : ''}
     <div class="card"><h2>วันนี้</h2>${logs}</div>
     ${st.actions.map(btn).join('')}
-    <div class="rule">ต้องอยู่ในรัศมี ${st.station.radius} ม. จากปั๊ม${st.rules.selfieRequired ? ' • ถ่ายเซลฟี่' : ''}${st.rules.qrRequired ? ' • สแกน QR ที่แคชเชียร์' : ''}</div>`);
+    <div class="rule">ต้องอยู่ในรัศมี ${st.station.radius} ม. จากปั๊ม${st.rules.selfieRequired ? ' • ถ่ายเซลฟี่' : ''}${st.rules.qrRequired ? ' • สแกน QR ที่แคชเชียร์' : ''}</div>
+    ${tabs('clock')}`);
+}
+
+/* ─────────── ของฉัน ─────────── */
+const TH_M = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+const thd = s => { const [y, m, d] = String(s).split('-').map(Number); return d + ' ' + TH_M[m - 1]; };
+const thRange = (a, b) => a === b ? thd(a) : thd(a) + ' – ' + thd(b);
+const ymd = ms => new Date(ms + 7 * 3600000).toISOString().slice(0, 10);
+const addD = (s, n) => ymd(Date.parse(s + 'T12:00:00+07:00') + n * 86400000 - 5 * 3600000);
+const STATUS_PILL = { 'รออนุมัติ': 'blue', 'อนุมัติ': '', 'ไม่อนุมัติ': 'red', 'ยกเลิก': 'gray' };
+
+async function loadMy() {
+  const m = await api('my');
+  if (!m.ok) { renderFatal('โหลดข้อมูลไม่ได้', m.message || 'ลองใหม่อีกครั้ง', true); return null; }
+  S.my = m; return m;
+}
+
+async function renderMy() {
+  renderLoading('กำลังโหลดสถิติ…');
+  const m = await loadMy(); if (!m) return;
+  const h = Math.floor(m.minutes / 60), mi = m.minutes % 60;
+  const stat = (v, label, cls) => `<div class="stat ${cls || ''}"><b>${v}</b><span>${label}</span></div>`;
+  const bal = m.balances.length ? m.balances.map(b => {
+    const q = b.quota, rem = b.remaining, pct = q ? Math.max(0, Math.min(100, rem / q * 100)) : 0;
+    return `<div class="balrow"><div class="t"><span>${esc(b.name)}</span><b>${q == null ? '-' : rem + ' / ' + q} วัน</b></div>
+      ${q ? `<div class="bar2"><i style="width:${pct}%"></i></div>` : ''}
+      ${b.pending ? `<div class="hint">รออนุมัติ ${b.pending} วัน</div>` : ''}${b.mode === 'ต่อครั้ง' ? '<div class="hint">สิทธิ์ต่อครั้ง</div>' : ''}</div>`;
+  }).join('') : '<p class="muted" style="margin:0">ยังไม่มีสิทธิ์วันลาที่คิดโควตา</p>';
+  paint(`<div class="card">
+      <h2>รอบเงินเดือน ${thRange(m.period.start, m.period.end)}</h2>
+      <div class="stat-grid">
+        ${stat(m.came + '<small style="font-size:14px;color:var(--muted)">/' + m.due + '</small>', 'มาทำงาน (กะ)')}
+        ${stat(h + '<small style="font-size:14px">:' + String(mi).padStart(2, '0') + '</small>', 'ชั่วโมงทำงาน')}
+        ${stat(m.leaveDays, 'ลา (วัน)')}
+        ${stat(m.late, 'สาย ' + m.lateMin + ' น.', m.late ? 'warn' : '')}
+        ${stat(m.absent, 'ขาด/ไม่ลงเวลา', m.absent ? 'bad' : '')}
+        ${stat(m.missOut, 'ลืมลงเวลาออก', m.missOut ? 'warn' : '')}
+      </div>
+      <p class="hint">นับถึงวันนี้ • ถ้าตัวเลขไม่ตรง ยื่น "ลืมลงเวลา" ในแท็บคำขอ (ย้อนหลังได้ ${m.rules.fixBack} วัน)</p>
+    </div>
+    <div class="card"><h2>วันลาคงเหลือ ปี ${Number(m.period.end.slice(0, 4)) + 543}</h2>${bal}</div>
+    <button class="btn ghost" data-act="tab" data-tab="req">📝 ขอลา / แก้เวลา / เปลี่ยนวันหยุด</button>
+    ${tabs('my')}`);
+}
+
+/* ─────────── คำขอ ─────────── */
+function reqWhat(r) {
+  if (r.kind === 'ลา') return esc(r.leaveName) + ' ' + thRange(r.start, r.end) + (r.part && r.part !== 'เต็มวัน' ? ' (' + esc(r.part) + ')' : '') + (r.days ? ' • ' + r.days + ' วัน' : '');
+  if (r.kind === 'แก้เวลา') return 'ลืมลงเวลา' + (r.detail.type === 'IN' ? 'เข้า' : 'ออก') + ' ' + esc(r.detail.time) + ' น. • ' + thd(r.start);
+  return 'หยุด ' + thd(r.detail.offDate) + ' → มาทำ ' + thd(r.detail.workDate);
+}
+async function renderReqs(note) {
+  if (!S.my) { renderLoading('กำลังโหลดคำขอ…'); if (!(await loadMy())) return; }
+  const m = S.my;
+  const list = m.requests.length ? m.requests.map(r => `<div class="req"><div class="t"><div><div class="what">${reqWhat(r)}</div>
+      ${r.note ? `<div class="hint">ผู้จัดการ: ${esc(r.note)}</div>` : ''}${r.needDoc && r.status !== 'ยกเลิก' && r.status !== 'ไม่อนุมัติ' ? '<div class="hint" style="color:var(--amber)">⚠️ ยังไม่แนบเอกสาร</div>' : ''}</div>
+      <span class="pill ${STATUS_PILL[r.status] || 'gray'}">${esc(r.status)}</span></div>
+      ${(r.status === 'รออนุมัติ' || (r.needDoc && r.status === 'อนุมัติ')) ? `<div class="acts">
+        ${r.needDoc ? `<button data-act="attach" data-id="${esc(r.id)}">📎 แนบเอกสาร</button>` : ''}
+        ${r.status === 'รออนุมัติ' ? `<button data-act="cancel-req" data-id="${esc(r.id)}">ยกเลิกคำขอ</button>` : ''}</div>` : ''}</div>`).join('')
+    : '<p class="muted" style="margin:0">ยังไม่มีคำขอ</p>';
+  paint(`${note || ''}
+    <div class="card"><h2>ยื่นคำขอใหม่</h2>
+      <button class="btn small" data-act="req-form" data-kind="ลา" style="margin-top:0">🏖 ขอลา</button>
+      <div class="row2"><button class="btn brk small" data-act="req-form" data-kind="แก้เวลา">⏱ ลืมลงเวลา</button>
+      <button class="btn brk small" data-act="req-form" data-kind="เปลี่ยนวันหยุด">🔁 เปลี่ยนวันหยุด</button></div>
+    </div>
+    <div class="card"><h2>คำขอของฉัน</h2>${list}</div>
+    ${DEMO ? '<button class="btn ghost small" data-act="demo-approve-req">จำลอง: ผู้จัดการอนุมัติคำขอที่รออยู่</button>' : ''}
+    <input type="file" id="docpick" accept="image/*" style="display:none">
+    ${tabs('req')}`);
+}
+
+function shrinkImage(file) {
+  return new Promise((res, rej) => {
+    const img = new Image();
+    img.onload = () => { const k = Math.min(1, 1600 / Math.max(img.width, img.height)); const c = document.createElement('canvas');
+      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(img.src); res(c.toDataURL('image/jpeg', 0.8)); };
+    img.onerror = rej; img.src = URL.createObjectURL(file);
+  });
+}
+
+async function attachDoc(id) {
+  const pick = $('#docpick');
+  pick.onchange = async () => {
+    if (!pick.files[0]) return;
+    renderLoading('กำลังอัปโหลดเอกสาร…');
+    let doc; try { doc = await shrinkImage(pick.files[0]); } catch (e) { return renderReqs('<div class="banner err">อ่านรูปไม่ได้</div>'); }
+    const r = await api('attachDoc', { id, doc });
+    S.my = null; await loadMy();
+    renderReqs(r.ok ? '<div class="banner ok">✓ แนบเอกสารแล้ว</div>' : `<div class="banner err">${esc(r.message)}</div>`);
+  };
+  pick.click();
+}
+
+async function cancelReq(id) {
+  if (!confirm('ยกเลิกคำขอนี้?')) return;
+  const r = await api('cancelRequest', { id });
+  S.my = null; await loadMy();
+  renderReqs(r.ok ? '<div class="banner ok">ยกเลิกแล้ว</div>' : `<div class="banner err">${esc(r.message)}</div>`);
+}
+
+function renderReqForm(kind) {
+  const m = S.my, today = ymd(serverNow());
+  let body = '';
+  if (kind === 'ลา') {
+    body = `<label class="f">ประเภทการลา</label>
+      <select class="f" name="leave">${m.leaveTypes.map(t => `<option value="${esc(t.code)}">${esc(t.name)}</option>`).join('')}</select>
+      <div class="hint" id="lvnote"></div>
+      <label class="f">ช่วง</label>
+      <div class="seg three"><label><input type="radio" name="part" value="เต็มวัน" checked><span>เต็มวัน</span></label><label><input type="radio" name="part" value="ครึ่งเช้า"><span>ครึ่งเช้า</span></label><label><input type="radio" name="part" value="ครึ่งบ่าย"><span>ครึ่งบ่าย</span></label></div>
+      <div class="row2"><div><label class="f">ตั้งแต่</label><input class="f" type="date" name="start" value="${addD(today, 1)}"></div>
+      <div id="endbox"><label class="f">ถึง</label><input class="f" type="date" name="end" value="${addD(today, 1)}"></div></div>
+      <div id="fdlbox" style="display:none"><label class="f">ความสัมพันธ์</label>
+        <select class="f" name="fdlRel"><option value="ครอบครัว">บุตร / คู่สมรส / พ่อแม่ (ไม่เกิน 5 วัน)</option><option value="ญาติ">ปู่ย่าตายาย / พี่น้อง / หลาน (ไม่เกิน 3 วัน)</option></select></div>
+      <div class="preview" id="pv">กำลังคำนวณ…</div>
+      <label class="f">รูปเอกสาร <span class="muted" style="font-weight:400">(แนบทีหลังได้)</span></label><input class="f" type="file" name="doc" accept="image/*">`;
+  } else if (kind === 'แก้เวลา') {
+    body = `<div class="row2"><div><label class="f">วันที่</label><input class="f" type="date" name="date" value="${today}" min="${addD(today, -m.rules.fixBack)}" max="${today}"></div>
+      <div><label class="f">เวลาที่มาจริง</label><input class="f" type="time" name="time" required></div></div>
+      <label class="f">ลืมลงเวลา</label>
+      <div class="seg"><label><input type="radio" name="type" value="IN" checked><span>เข้างาน</span></label><label><input type="radio" name="type" value="OUT"><span>ออกงาน</span></label></div>
+      <div class="hint">ย้อนหลังได้ ${m.rules.fixBack} วัน • เดือนละไม่เกิน 4 ครั้ง • ผู้จัดการจะตรวจกับกล้องวงจรปิด/หัวหน้ากะ</div>`;
+  } else {
+    body = `<div class="row2"><div><label class="f">ขอหยุดวันที่ <span class="muted" style="font-weight:400">(วันที่มีกะ)</span></label><input class="f" type="date" name="offDate" min="${addD(today, 1)}" max="${addD(today, m.rules.dayoffAhead)}" required></div>
+      <div><label class="f">มาทำงานแทนวันที่ <span class="muted" style="font-weight:400">(วันหยุดเดิม)</span></label><input class="f" type="date" name="workDate" min="${addD(today, 1)}" max="${addD(today, m.rules.dayoffAhead)}" required></div></div>
+      <div class="hint">กะที่ทำในวันที่มาแทน = กะเดิมของวันที่ขอหยุด</div>`;
+  }
+  paint(`<div class="card"><h1>${kind === 'ลา' ? 'ขอลา' : kind === 'แก้เวลา' ? 'ลืมลงเวลา' : 'ขอเปลี่ยนวันหยุด'}</h1>
+    <form id="rf">${body}
+      <label class="f">เหตุผล</label><textarea class="f" name="reason" rows="2" maxlength="300" required placeholder="${kind === 'แก้เวลา' ? 'เช่น มือถือแบตหมด แจ้งหัวหน้ากะแล้ว' : 'ระบุเหตุผลสั้นๆ'}"></textarea>
+      <div id="rfmsg"></div>
+      <button class="btn" type="submit">ส่งคำขอ</button>
+    </form></div>
+    <button class="btn ghost" data-act="tab" data-tab="req">ยกเลิก</button>`);
+  const f = $('#rf');
+  if (kind === 'ลา') {
+    let timer = null, seq = 0;
+    const upd = () => {
+      const lt = m.leaveTypes.find(t => t.code === f.leave.value) || {};
+      const half = f.part.value !== 'เต็มวัน';
+      $('#endbox').style.visibility = half ? 'hidden' : '';
+      if (half || f.end.value < f.start.value) f.end.value = f.start.value;
+      $('#fdlbox').style.display = lt.code === 'FDL' ? '' : 'none';
+      const need = lt.noticeH >= 24 ? 'แจ้งล่วงหน้า ' + Math.round(lt.noticeH / 24) + ' วัน' : lt.noticeH ? 'แจ้งก่อนเข้ากะ ' + lt.noticeH + ' ชม.' : '';
+      $('#lvnote').textContent = [need, lt.retro ? 'ขอย้อนหลังได้ในรอบเงินเดือนนี้' : '', lt.doc ? 'เอกสาร: ' + lt.note : ''].filter(Boolean).join(' • ');
+      $('#pv').className = 'preview'; $('#pv').textContent = 'กำลังคำนวณ…';
+      clearTimeout(timer);
+      timer = setTimeout(async () => {
+        const my = ++seq;
+        const r = await api('leavePreview', { form: { leave: f.leave.value, start: f.start.value, end: f.end.value, part: f.part.value, fdlRel: f.fdlRel.value } });
+        if (my !== seq) return;
+        if (!r.ok) { $('#pv').className = 'preview err'; $('#pv').textContent = r.message; return; }
+        const b = r.balance;
+        let t = r.problem ? '' : 'ลาครั้งนี้ <b>' + r.days + ' วัน</b>';
+        if (b && b.quota != null) t += (t ? '<br>' : '') + 'คงเหลือตอนนี้ ' + b.remaining + ' วัน' + (r.problem ? '' : ' → <b>หลังลาเหลือ ' + (b.remaining - r.days) + ' วัน</b>');
+        if (r.problem) { $('#pv').className = 'preview err'; t = esc(r.problem) + (t ? '<br>' + t : ''); }
+        $('#pv').innerHTML = t || '—';
+      }, 350);
+    };
+    ['leave', 'start', 'end', 'fdlRel'].forEach(n => f[n].addEventListener('change', upd));
+    f.querySelectorAll('[name=part]').forEach(x => x.addEventListener('change', upd));
+    upd();
+  }
+  f.addEventListener('submit', async ev => {
+    ev.preventDefault();
+    const btn = f.querySelector('button[type=submit]');
+    const form = Object.fromEntries(new FormData(f).entries());
+    form.kind = kind;
+    delete form.doc;
+    if (!String(form.reason || '').trim()) { $('#rfmsg').innerHTML = '<div class="banner err" style="margin-top:12px">ใส่เหตุผลก่อนส่ง</div>'; return; }
+    btn.disabled = true; btn.textContent = 'กำลังส่ง…';
+    try { if (f.doc && f.doc.files[0]) form.doc = await shrinkImage(f.doc.files[0]); } catch (e) {}
+    const r = await api('request', { form });
+    if (!r.ok) { $('#rfmsg').innerHTML = `<div class="banner err" style="margin-top:12px">${esc(r.message)}</div>`; btn.disabled = false; btn.textContent = 'ส่งคำขอ'; return; }
+    S.my = null; await loadMy();
+    renderReqs('<div class="banner ok">✓ ส่งคำขอแล้ว รอผู้จัดการอนุมัติ' + (r.flags && r.flags.indexOf('ยังไม่แนบเอกสาร') >= 0 ? ' • อย่าลืมแนบเอกสาร' : '') + '</div>');
+  });
 }
 
 /* ─────────── เซลฟี่: กล้องสดเท่านั้น ไม่มีเลือกรูปจากอัลบั้ม ─────────── */
@@ -370,18 +602,64 @@ async function stampImage(src, lines, accent) {
 }
 
 /* ─────────── ขั้นตอนลงเวลา: หน้าจอเดียว GPS + ใบหน้า แล้วบันทึกเอง ─────────── */
+/** นาทีที่ออกก่อนเลิกกะ (ประมาณจากกะที่เปิดอยู่) */
+function expectedEarlyMin() {
+  const t = S.status.today || {}, open = t.open;
+  if (!open || !open.shift) return 0;
+  const s = (t.shifts || []).find(x => x.code === open.shift);
+  if (!s) return 0;
+  const today = ymd(serverNow());
+  const at = hhmm => Date.parse(today + 'T' + hhmm + ':00+07:00');
+  let end = at(s.end);
+  if (s.end <= s.start && serverNow() > at(s.start) - 6 * 3600000) end += 86400000; // กะข้ามเที่ยงคืน
+  return Math.floor((end - serverNow()) / 60000);
+}
+
+const fmtMin = m => m >= 60 ? Math.floor(m / 60) + ' ชม.' + (m % 60 ? ' ' + (m % 60) + ' นาที' : '') : m + ' นาที';
+const EARLY_REASONS = ['ไม่สบาย', 'ธุระด่วนทางบ้าน', 'หัวหน้าให้กลับก่อน', 'สลับกะกับเพื่อน', 'อื่นๆ'];
+function drawReason() {
+  const f = S.flow, el = $('#sec-reason');
+  if (!el || !f) return;
+  if (!f.needReason) { el.innerHTML = ''; return; }
+  const other = f.reasonPick === 'อื่นๆ';
+  el.innerHTML = `<div class="reason"><div class="q">↩️ ออกก่อนเลิกกะ${f.needReason > 0 ? ' ' + fmtMin(f.needReason) : ''} • ทำไมต้องออกก่อน?</div>
+    <div class="chips">${EARLY_REASONS.map(x => `<button type="button" class="${f.reasonPick === x ? 'on' : ''}" data-act="early-pick" data-v="${esc(x)}">${esc(x)}</button>`).join('')}</div>
+    ${other ? `<div class="other"><input id="reasontxt" maxlength="150" placeholder="พิมพ์เหตุผล" value="${esc(f.reasonText || '')}"><button type="button" data-act="early-ok">ตกลง</button></div>` : ''}
+    ${f.reason ? `<div class="hint" style="color:#6b4000">✓ เหตุผล: ${esc(f.reason)}</div>` : ''}</div>`;
+  if (other && !f.reason) { const i = $('#reasontxt'); if (i) i.focus(); }
+}
+function pickReason(v) {
+  const f = S.flow; if (!f) return;
+  f.reasonPick = v;
+  if (v === 'อื่นๆ') { f.reason = ''; drawReason(); return; }
+  f.reason = v; drawReason();
+  if (f.error && f.error.reason) { f.error = null; drawErr(); }
+  trySubmit();
+}
+function confirmOtherReason() {
+  const f = S.flow, i = $('#reasontxt'); if (!f || !i) return;
+  const v = i.value.trim();
+  if (!v) { i.focus(); return; }
+  f.reasonText = v; f.reason = v; drawReason();
+  if (f.error && f.error.reason) { f.error = null; drawErr(); }
+  trySubmit();
+}
+
 function startFlow(type) {
   const r = S.status.rules;
   S.flow = { type, gps: { state: 'idle' }, face: null, error: null, submitting: false, ctl: { cancelled: false } };
+  if (type === 'OUT' && r.earlyReasonMin > 0) { const em = expectedEarlyMin(); if (em >= r.earlyReasonMin) S.flow.needReason = em; }
   paint(`<div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
         <h1 style="margin:0">ลงเวลา${LABEL[type]}</h1><span id="gpsline" class="pill gray">📍 กำลังหาตำแหน่ง…</span>
       </div>
+      <div id="sec-reason"></div>
       <div id="facebox" style="margin-top:12px"></div>
       <div id="sec-qr"></div>
     </div>
     <div id="sec-err"></div>
     <button class="btn ghost" data-act="home">ยกเลิก</button>`);
+  drawReason();
   acquireGps();
   fetchNetIp();
   drawQr();
@@ -506,6 +784,7 @@ function trySubmit() {
   const f = S.flow;
   if (!f || f.submitting || f.error) return;
   if (!f.face) return;
+  if (f.needReason && !f.reason) { const s = $('#facebox .say'); if (s) s.textContent = '✓ ถ่ายแล้ว • เลือกเหตุผลที่ออกก่อนด้านบน'; drawReason(); return; }
   if (f.gps.state !== 'ok') { const s = $('#facebox .say'); if (s && f.gps.state === 'wait') s.textContent = '✓ ถ่ายแล้ว • รอตำแหน่ง GPS…'; return; }
   if (S.status.rules.qrRequired && !qrFresh()) return;
   submit();
@@ -519,7 +798,7 @@ async function submit() {
   const now = Date.now();
   const r = await api('clock', {
     type: f.type, qr: S.qr, netIp: f.netIp || '', lat: f.gps.lat, lng: f.gps.lng, acc: f.gps.acc, posTime: f.gps.at, clientTime: now,
-    photo: f.face.dataUrl || '', photoTakenAt: f.face.takenAt || 0, photoSource: 'camera',
+    photo: f.face.dataUrl || '', photoTakenAt: f.face.takenAt || 0, photoSource: 'camera', earlyReason: f.reason || '',
   }).catch(() => ({ ok: false, message: 'ส่งข้อมูลไม่สำเร็จ ตรวจอินเทอร์เน็ตแล้วลองใหม่' }));
   if (S.flow !== f) return;
   f.submitting = false;
@@ -528,6 +807,7 @@ async function submit() {
     if (e === 'outside' || e === 'gps_inaccurate' || e === 'gps_stale') f.error = { msg: r.message, act: 'gps', label: 'หาตำแหน่งใหม่' };
     else if (e === 'photo') { f.face = null; $('#facebox').innerHTML = ''; f.error = { msg: r.message, act: 'reface', label: 'ถ่ายใหม่' }; }
     else if (e === 'qr') { S.qr = null; drawQr(); f.error = { msg: r.message }; }
+    else if (e === 'need_reason') { const m = /(\d+) นาที/.exec(r.message || ''); f.needReason = m ? Number(m[1]) : -1; f.reason = ''; drawReason(); f.error = { msg: r.message, reason: true }; }
     else f.error = { msg: r.message || 'บันทึกไม่สำเร็จ', act: 'resubmit', label: 'ลองส่งอีกครั้ง' };
     return drawErr();
   }
@@ -539,7 +819,7 @@ function renderResult(r) {
   if (S.flow) S.flow.ctl.cancelled = true;
   S.flow = null;
   const late = r.lateMin ? `<span class="pill amber">สาย ${r.lateMin} นาที</span>` : r.type === 'IN' ? '<span class="pill">ตรงเวลา</span>' : '';
-  const early = r.earlyMin ? `<span class="pill amber">ออกก่อนเวลา ${r.earlyMin} นาที</span>` : '';
+  const early = r.earlyMin ? `<span class="pill amber">ออกก่อนเวลา ${fmtMin(r.earlyMin)}${r.earlyReason ? ' • ' + esc(r.earlyReason) : ''}</span>` : '';
   paint(`<div class="card center">
     <div class="big-ok">✓</div>
     <h1>บันทึก${esc(r.label)}แล้ว</h1>
@@ -558,13 +838,20 @@ document.addEventListener('click', ev => {
   const a = b.dataset.act;
   ({
     reload: () => loadStatus(),
-    home: () => { if (S.flow) S.flow.ctl.cancelled = true; S.flow = null; renderHome(); },
+    home: () => { if (S.flow) S.flow.ctl.cancelled = true; S.flow = null; openTab('clock'); },
     start: () => startFlow(b.dataset.type),
+    tab: () => openTab(b.dataset.tab),
+    'req-form': () => renderReqForm(b.dataset.kind),
+    'cancel-req': () => cancelReq(b.dataset.id),
+    attach: () => attachDoc(b.dataset.id),
+    'demo-approve-req': async () => { Mock.approveReqs(); S.my = null; await loadMy(); renderReqs('<div class="banner ok">จำลอง: อนุมัติแล้ว</div>'); },
     scan: () => scanQr(),
     gps: () => { S.flow.error = null; drawErr(); acquireGps(); },
     reface: () => { S.flow.error = null; S.flow.face = null; doFace(); },
     resubmit: () => { S.flow.error = null; trySubmit(); },
     close: () => liff.closeWindow(),
+    'early-pick': () => pickReason(b.dataset.v),
+    'early-ok': () => confirmOtherReason(),
     'demo-in': () => { S.demo.inside = true; refreshDemo(); },
     'demo-out': () => { S.demo.inside = false; refreshDemo(); },
     'demo-qr': () => { S.demo.qrOk = !S.demo.qrOk; if (!S.demo.qrOk) S.qr = null; refreshDemo(); },
@@ -585,6 +872,8 @@ function loadScript(src) { return new Promise((ok, no) => { const s = document.c
 async function boot() {
   S.deviceId = getDeviceId();
   captureToken(location.search);
+  const tabQ = /[?&]tab=(my|req)/.exec(decodeURIComponent(location.search));
+  if (tabQ) S.tab = tabQ[1];
   if (DEMO) { S.idToken = 'demo'; return loadStatus(); }
   renderLoading('กำลังเชื่อมต่อ LINE…');
   try {
@@ -603,13 +892,13 @@ async function boot() {
 /* ═══════════════════════ เซิร์ฟเวอร์จำลอง (ใช้เฉพาะโหมดทดลอง) ═══════════════════════ */
 const Mock = (() => {
   const station = { name: 'หจก. บ้านท่าบริการ', lat: 19.736627, lng: 99.142776, radius: 100, maxAccuracy: 50 };
-  const rules = { qrRequired: false, selfieRequired: true, liveness: false, faceMatch: false, breakEnabled: true, qrStepSec: 30, qrValidSec: 90, photoRetentionDays: 90 };
+  const rules = { earlyReasonMin: 5, qrRequired: false, selfieRequired: true, liveness: false, faceMatch: false, breakEnabled: true, qrStepSec: 30, qrValidSec: 90, photoRetentionDays: 90 };
   const SECRET = 'demo-secret';
   let st, kioskTimer = null;
   function reset() {
     const now = Date.now(), slot = 30 * 60000;
     const start = Math.ceil((now + 60000) / slot) * slot; // กะทดลองเริ่มภายใน 30 นาทีข้างหน้า
-    st = { emp: null, logs: [], shift: { code: 'B2', name: 'กะทดลอง', start, end: start + 9 * 3600000 } };
+    st = { emp: null, logs: [], reqs: [], shift: { code: 'B2', name: 'กะทดลอง', start, end: start + 9 * 3600000 } };
   }
   reset();
   const hm = ms => fmtTime(ms, false);
@@ -663,9 +952,10 @@ const Mock = (() => {
     let lateMin = 0, earlyMin = 0;
     if (b.type === 'IN') { const lm = Math.floor((now - st.shift.start) / 60000); if (lm > 5) lateMin = lm; }
     if (b.type === 'OUT' && now < st.shift.end) earlyMin = Math.floor((st.shift.end - now) / 60000);
+    if (earlyMin >= rules.earlyReasonMin && !b.earlyReason) return fail('need_reason', 'ออกก่อนเลิกกะ ' + earlyMin + ' นาที กรุณาเลือกเหตุผล');
     const time = fmtTime(now);
     st.logs.push({ code: b.type, time, shift: st.shift.code, lateMin, earlyMin, at: now });
-    return { ok: true, type: b.type, label: LABEL[b.type], time, serverTime: now, shift: st.shift.code, lateMin, earlyMin, distance: Math.round(d), flags: [] };
+    return { ok: true, type: b.type, label: LABEL[b.type], time, serverTime: now, shift: st.shift.code, lateMin, earlyMin, earlyReason: earlyMin ? b.earlyReason : '', distance: Math.round(d), flags: [] };
   }
   async function handle(b) {
     await new Promise(r => setTimeout(r, 300));
@@ -679,9 +969,73 @@ const Mock = (() => {
       return { ok: true };
     }
     if (b.action === 'clock') return clock(b);
+    if (b.action === 'my') return my();
+    if (b.action === 'leavePreview') { const c = checkLeave(b.form); return { ok: true, days: c.days || 0, problem: c.problem, balance: bal(b.form.leave) }; }
+    if (b.action === 'request') return request(b.form);
+    if (b.action === 'cancelRequest') { const r = st.reqs.find(x => x.id === b.id); if (!r || r.status !== 'รออนุมัติ') return fail('rule', 'ยกเลิกได้เฉพาะคำขอที่รออนุมัติ'); r.status = 'ยกเลิก'; return { ok: true }; }
+    if (b.action === 'attachDoc') { const r = st.reqs.find(x => x.id === b.id); if (r) r.needDoc = false; return { ok: true }; }
     return fail('unknown', '');
   }
   function approve() { if (st.emp) { st.emp.status = 'ใช้งาน'; st.emp.id = st.emp.unit === 'คาเฟ่' ? 'C01' : 'P03'; } }
+
+  // ───── คำขอ (จำลอง) ─────
+  const LT = [
+    { code: 'SL', name: 'ลาป่วย', quota: 30, mode: 'ต่อปี', noticeH: 3, retro: false, doc: true, note: 'ใบรับรองแพทย์ทุกครั้ง' },
+    { code: 'BL', name: 'ลากิจ', quota: 3, mode: 'ต่อปี', noticeH: 168, retro: false, doc: true, note: 'เอกสารยืนยันวันและสถานที่' },
+    { code: 'AL', name: 'ลาพักร้อน', quota: 3, mode: 'ตามอายุงาน', noticeH: 0, retro: false, doc: false, note: '' },
+    { code: 'FDL', name: 'ลาฌาปนกิจ', quota: 5, mode: 'ต่อครั้ง', noticeH: 0, retro: true, doc: true, note: 'ใบมรณบัตร + เอกสารแสดงความสัมพันธ์' },
+    { code: 'LWP', name: 'ลาไม่รับค่าจ้าง', quota: null, mode: 'ไม่จำกัด', noticeH: 336, retro: false, doc: false, note: '' },
+  ];
+  const today = () => ymd(Date.now());
+  const span = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / 86400000) + 1;
+  function bal(code) {
+    const t = LT.find(x => x.code === code); if (!t) return null;
+    const mine = st.reqs.filter(r => r.kind === 'ลา' && r.leave === code && (r.status === 'อนุมัติ' || r.status === 'รออนุมัติ'));
+    const used = mine.filter(r => r.status === 'อนุมัติ').reduce((a, r) => a + r.days, 0), pending = mine.filter(r => r.status === 'รออนุมัติ').reduce((a, r) => a + r.days, 0);
+    return { code, name: t.name, mode: t.mode, quota: t.mode === 'ต่อครั้ง' ? t.quota : t.quota, used, pending, remaining: t.quota == null ? null : Math.max(0, t.quota - used - pending) };
+  }
+  function checkLeave(f) {
+    const t = LT.find(x => x.code === f.leave);
+    if (!t || !f.start) return { problem: 'เลือกประเภทและวันที่' };
+    const end = f.part !== 'เต็มวัน' ? f.start : (f.end || f.start);
+    if (end < f.start) return { problem: 'วันที่ไม่ถูกต้อง' };
+    const days = f.part !== 'เต็มวัน' ? 0.5 : span(f.start, end);
+    if (f.start < today() && !t.retro) return { days, problem: t.name + 'ขอย้อนหลังไม่ได้ ติดต่อผู้ดูแล' };
+    const hrs = (Date.parse(f.start + 'T08:00:00+07:00') - Date.now()) / 3600000;
+    if (t.noticeH && hrs < t.noticeH) return { days, problem: t.name + 'ต้องแจ้งล่วงหน้าอย่างน้อย ' + (t.noticeH >= 24 ? Math.round(t.noticeH / 24) + ' วัน' : t.noticeH + ' ชั่วโมง') + ' ก่อนเริ่มกะ' };
+    const b = bal(t.code);
+    if (b && b.remaining != null && t.mode !== 'ต่อครั้ง' && days > b.remaining) return { days, problem: t.name + 'คงเหลือ ' + b.remaining + ' วัน (ขอ ' + days + ' วัน)' };
+    if (st.reqs.some(r => r.kind === 'ลา' && (r.status === 'อนุมัติ' || r.status === 'รออนุมัติ') && !(r.end < f.start || r.start > end))) return { days, problem: 'มีใบลาในช่วงวันนี้อยู่แล้ว' };
+    return { days, end, t };
+  }
+  function my() {
+    const s = state(), came = st.logs.filter(l => l.code === 'IN').length;
+    const lateL = st.logs.filter(l => l.code === 'IN' && l.lateMin > 0);
+    const p = today().slice(0, 8);
+    return { ok: true, period: { label: today().slice(0, 7), start: addD(p + '01', -3), end: p + '28' }, due: Math.max(came, 1), came, late: lateL.length,
+      lateMin: lateL.reduce((a, l) => a + l.lateMin, 0), absent: 0, missOut: 0, minutes: st.logs.filter(l => l.code === 'IN').length ? Math.round((Date.now() - st.logs.find(l => l.code === 'IN').at) / 60000) : 0,
+      leaveDays: st.reqs.filter(r => r.kind === 'ลา' && r.status === 'อนุมัติ').reduce((a, r) => a + r.days, 0),
+      balances: LT.filter(t => t.mode !== 'ไม่จำกัด').map(t => bal(t.code)),
+      requests: st.reqs.slice().reverse(), leaveTypes: LT, rules: { fixBack: 3, dayoffAhead: 30 } };
+  }
+  function request(f) {
+    let r = { id: 'R' + Date.now(), kind: f.kind, status: 'รออนุมัติ', note: '', detail: {}, needDoc: false, days: 0 };
+    if (!String(f.reason || '').trim()) return fail('invalid', 'ต้องใส่เหตุผล');
+    if (f.kind === 'ลา') {
+      const c = checkLeave(f); if (c.problem) return fail('rule', c.problem);
+      Object.assign(r, { leave: f.leave, leaveName: c.t.name, start: f.start, end: c.end, part: f.part, days: c.days, needDoc: c.t.doc && !f.doc });
+    } else if (f.kind === 'แก้เวลา') {
+      if (!f.date || !f.time) return fail('invalid', 'ใส่วันที่และเวลา');
+      if (f.date < addD(today(), -3)) return fail('rule', 'ขอแก้เวลาย้อนหลังได้ไม่เกิน 3 วัน');
+      Object.assign(r, { start: f.date, end: f.date, detail: { type: f.type, time: f.time } });
+    } else {
+      if (!f.offDate || !f.workDate || f.offDate === f.workDate) return fail('invalid', 'เลือกวันที่ให้ครบ');
+      Object.assign(r, { start: f.offDate, end: f.offDate, detail: { offDate: f.offDate, workDate: f.workDate, codes: st.shift.code } });
+    }
+    st.reqs.push(r);
+    return { ok: true, id: r.id, status: r.status, days: r.days, flags: r.needDoc ? ['ยังไม่แนบเอกสาร'] : [] };
+  }
+  function approveReqs() { st.reqs.forEach(r => { if (r.status === 'รออนุมัติ') r.status = 'อนุมัติ'; }); }
 
   function overlay(html) {
     const o = document.createElement('div'); o.className = 'overlay';
@@ -723,7 +1077,7 @@ const Mock = (() => {
     overlay(`<h1>ตัวอย่างสรุปในกลุ่ม LINE ผู้บริหาร</h1><p class="muted" style="font-size:14px">ส่งวันละ 2 รอบ (≈09:30 และ ≈21:30) เหตุร้ายแรงจะแจ้งทันที</p>
       <div class="chat"><div class="who">${esc(station.name)}</div><div class="bubble">${esc(lines.join('\n'))}</div></div>`);
   }
-  return { handle, approve, reset, kioskUrl, showKiosk, stopKiosk, showSummary };
+  return { handle, approve, approveReqs, reset, kioskUrl, showKiosk, stopKiosk, showSummary };
 })();
 
 boot();
